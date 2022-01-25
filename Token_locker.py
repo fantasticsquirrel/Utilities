@@ -13,7 +13,7 @@ def change_metadata(key: str, new_value: str):
 @export
 def new_locker(locker_id : str, contract: str, lock_until_year : int, lock_until_month : int, lock_until_day : int, ):
 
-    assert bool(data[locker_id, 'match_owner']) == False, "This match has already been created, please create one with a different name."
+    assert bool(data[locker_id, 'locker_owner']) == False, "This match has already been created, please create one with a different name."
     assert lock_until_day != None, 'Must provide end day of lock!'
     assert lock_until_month != None, 'Must provide end month of lock!'
     assert lock_until_year != None, 'Must provide end year of lock!'
