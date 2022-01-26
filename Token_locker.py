@@ -11,19 +11,19 @@ def change_metadata(key: str, new_value: str):
     metadata[key] = new_value
 
 @export
-def new_locker(locker_id : str, contract: str, lock_until_year : int, lock_until_month : int, lock_until_day : int, ):
+def new_locker(locker_id : str, contract: str, lock_until_year : int, lock_until_month : int, lock_until_day : int, lock_until_hour: int = 0):
 
-    assert bool(data[locker_id, 'locker_owner']) == False, "This match has already been created, please create one with a different name."
+    assert bool(data[locker_id, 'locker_owner']) == False, "This locker has already been created, please create one with a different name."
     assert lock_until_day != None, 'Must provide end day of lock!'
     assert lock_until_month != None, 'Must provide end month of lock!'
     assert lock_until_year != None, 'Must provide end year of lock!'
-    assert datetime.datetime(year=lock_until_year, month=lock_until_month, day=lock_until_day) >= now, 'Lock end cannot be in the past!'
+    assert datetime.datetime(year=lock_until_year, month=lock_until_month, day=lock_until_day, hour=lock_until_hour) >= now, 'Lock end cannot be in the past!'
 
     data[locker_id, 'locker_owner'] = ctx.caller
     data[locker_id, 'contract'] = contract
     data[locker_id, 'staked_wallets'] = {}
     data[locker_id, 'total_locked'] = 0
-    data[locker_id, 'end_date'] = datetime.datetime(year=lock_until_year, month=lock_until_month, day=lock_until_day, hour=0, minute=0, microsecond=0)
+    data[locker_id, 'end_date'] = datetime.datetime(year=lock_until_year, month=lock_until_month, day=lock_until_day, hour=lock_until_hour, minute=0, microsecond=0)
 
 @export
 def stake_token(locker_id: str, tokens_to_lock: float, contract: str):
@@ -49,7 +49,7 @@ def end_locker(locker_id: str):
     assert now >= data[locker_id, 'end_date'], f"This token locker has not ended yet. It will end on {data[locker_id, 'end_date']}."
 
     staked_wallets = data[locker_id, 'staked_wallets']
-    token = importlib.import_module(contract)
+    token = importlib.import_module(data[locker_id, 'contract'])
 
     for key, value in dict(staked_wallets).items():
         token.transfer(amount=value, to=key)
@@ -59,4 +59,3 @@ def end_locker(locker_id: str):
     data[locker_id, 'staked_wallets'] = {}
     data[locker_id, 'total_locked'] = 0
     data[locker_id, 'end_date'] = None
-
